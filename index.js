@@ -120,13 +120,28 @@ function getEdgeJson(edge, portToParentDict) {
 const path = require('path');
 
 if (process.argv.length < 3) {
-    console.error(`usage: ${process.argv[1]} <path-to-file.json>`);
-    process.exit(1);
+    let jsonData = '';
+    process.stdin.on('readable', function() {
+        let chunk;
+        while ((chunk = process.stdin.read()) !== null) {
+            jsonData += chunk;
+        }
+
+    });
+    process.stdin.on('end', () => {
+        if (jsonData.length) {
+            handleInput(JSON.parse(jsonData));
+        } else {
+            console.error(`usage: ${process.argv[1]} <path-to-file.json>`);
+            process.exit(1);
+        }
+    });
+} else {
+    const json = require(path.resolve(process.argv[2]));
+    handleInput(json)
 }
 
-const json = require(path.resolve(process.argv[2]));
-(async function(json) {
+async function handleInput(json) {
     addMissingNodeIDs(json);
     console.log(JSON.stringify(await layout(json), null, 2));
-})(json);
-
+}
