@@ -4,6 +4,11 @@ const ELK = require('elkjs');
 const _ = require('lodash');
 const assert = require('assert');
 
+function isEdge(nodeJson) {  // TODO: this may need to change
+    const pointers = nodeJson.pointers || {};
+    return pointers.src && pointers.dst;
+}
+
 let idSuffix = Date.now();
 function newID() {
     return `@id:nodeID_${idSuffix++}`;
@@ -43,11 +48,6 @@ function addMissingNodeIDs(nodeJson) {
     nodeJson.id = nodeJson.id || newID();
     const children = nodeJson.children || [];
     children.forEach(addMissingNodeIDs);
-}
-
-function isEdge(nodeJson) {
-    const pointers = nodeJson.pointers || {};
-    return pointers.src && pointers.dst;
 }
 
 function getNodeID(nodeJson) {
